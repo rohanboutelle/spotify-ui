@@ -9,7 +9,7 @@ export default function PlaylistView({ id }) {
   const [playlist, setPlaylist] = useState(null);
   const [tracks, setTracks] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState(null);
   const [loadingMore, setLoadingMore] = useState(false);
   const [nextOffset, setNextOffset] = useState(null);
 
@@ -18,7 +18,7 @@ export default function PlaylistView({ id }) {
 
   const load = useCallback(async () => {
     setLoading(true);
-    setError(false);
+    setError(null);
     setTracks([]);
     setPlaylist(null);
 
@@ -34,13 +34,12 @@ export default function PlaylistView({ id }) {
 
     try {
       await attempt();
-    } catch {
-      // auto-retry once after a short delay
+    } catch (firstErr) {
       try {
         await new Promise(r => setTimeout(r, 1000));
         await attempt();
-      } catch {
-        setError(true);
+      } catch (err) {
+        setError(err?.message || firstErr?.message || 'Unknown error');
       }
     } finally {
       setLoading(false);
@@ -78,6 +77,7 @@ export default function PlaylistView({ id }) {
     return (
       <div className="h-full flex flex-col items-center justify-center gap-4">
         <p className="text-[#B3B3B3] text-sm">Failed to load playlist.</p>
+        <p className="text-[#6A6A6A] text-xs font-mono max-w-sm text-center">{error}</p>
         <button
           onClick={load}
           className="bg-[#1DB954] hover:bg-[#1ed760] text-black font-bold py-2 px-6 rounded-full text-sm transition-colors"
