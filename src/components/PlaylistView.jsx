@@ -9,6 +9,7 @@ export default function PlaylistView({ id }) {
   const [playlist, setPlaylist] = useState(null);
   const [tracks, setTracks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [nextOffset, setNextOffset] = useState(null);
 
@@ -17,6 +18,7 @@ export default function PlaylistView({ id }) {
 
   useEffect(() => {
     setLoading(true);
+    setError(false);
     setTracks([]);
     setPlaylist(null);
 
@@ -29,6 +31,8 @@ export default function PlaylistView({ id }) {
         setPlaylist(pl);
         setTracks(tr.items?.filter(i => i.track) || []);
         setNextOffset(tr.next ? 50 : null);
+      } catch {
+        setError(true);
       } finally {
         setLoading(false);
       }
@@ -57,6 +61,14 @@ export default function PlaylistView({ id }) {
     return (
       <div className="h-full flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-[#1DB954] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <p className="text-[#B3B3B3] text-sm">Failed to load playlist. Please try again.</p>
       </div>
     );
   }

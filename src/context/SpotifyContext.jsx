@@ -79,24 +79,20 @@ export function SpotifyProvider({ children }) {
     spotify.getUserPlaylists(50).then(d => setPlaylists(d?.items || [])).catch(() => {});
   }, []);
 
-  // Poll playback state (fallback + for non-SDK events)
+  // Poll playback state every 3s to keep track info and play/pause fresh
   useEffect(() => {
     if (!isLoggedIn()) return;
 
     const poll = async () => {
       try {
         const state = await spotify.getPlaybackState();
-        if (state && !playerState) {
-          // Only update from API when SDK hasn't given us state
-          setPlayerState(prev => prev || state);
-        }
+        if (state) setPlayerState(state);
       } catch (_) {}
     };
 
     poll();
-    pollRef.current = setInterval(poll, 5000);
+    pollRef.current = setInterval(poll, 3000);
     return () => clearInterval(pollRef.current);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const refreshPlaybackState = useCallback(async () => {

@@ -33,7 +33,7 @@ export default function TrackItem({ track, index, contextUri, offset }) {
   return (
     <div
       className="track-row flex items-center gap-3 px-4 py-2 rounded-md group cursor-pointer hover:bg-[#282828] transition-colors"
-      onDoubleClick={handlePlay}
+      onClick={handlePlay}
     >
       {/* Index / play icon */}
       <div className="w-5 text-center shrink-0">
