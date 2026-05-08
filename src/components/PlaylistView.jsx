@@ -16,29 +16,38 @@ export default function PlaylistView({ id }) {
   const isContextPlaying =
     playerState?.context?.uri === playlist?.uri && playerState?.is_playing;
 
-  useEffect(() => {
+  const load = useCallback(async () => {
     setLoading(true);
     setError(false);
     setTracks([]);
     setPlaylist(null);
 
-    const load = async () => {
+    const attempt = async () => {
+      const [pl, tr] = await Promise.all([
+        spotify.getPlaylist(id),
+        spotify.getPlaylistTracks(id, 50, 0),
+      ]);
+      setPlaylist(pl);
+      setTracks(tr.items?.filter(i => i.track) || []);
+      setNextOffset(tr.next ? 50 : null);
+    };
+
+    try {
+      await attempt();
+    } catch {
+      // auto-retry once after a short delay
       try {
-        const [pl, tr] = await Promise.all([
-          spotify.getPlaylist(id),
-          spotify.getPlaylistTracks(id, 50, 0),
-        ]);
-        setPlaylist(pl);
-        setTracks(tr.items?.filter(i => i.track) || []);
-        setNextOffset(tr.next ? 50 : null);
+        await new Promise(r => setTimeout(r, 1000));
+        await attempt();
       } catch {
         setError(true);
-      } finally {
-        setLoading(false);
       }
-    };
-    load();
+    } finally {
+      setLoading(false);
+    }
   }, [id]);
+
+  useEffect(() => { load(); }, [load]);
 
   const loadMore = useCallback(async () => {
     if (!nextOffset || loadingMore) return;
@@ -67,8 +76,14 @@ export default function PlaylistView({ id }) {
 
   if (error) {
     return (
-      <div className="h-full flex items-center justify-center">
-        <p className="text-[#B3B3B3] text-sm">Failed to load playlist. Please try again.</p>
+      <div className="h-full flex flex-col items-center justify-center gap-4">
+        <p className="text-[#B3B3B3] text-sm">Failed to load playlist.</p>
+        <button
+          onClick={load}
+          className="bg-[#1DB954] hover:bg-[#1ed760] text-black font-bold py-2 px-6 rounded-full text-sm transition-colors"
+        >
+          Try again
+        </button>
       </div>
     );
   }
