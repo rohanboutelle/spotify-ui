@@ -1,5 +1,5 @@
-const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
-const REDIRECT_URI = import.meta.env.VITE_REDIRECT_URI || `${window.location.origin}/callback`;
+const CLIENT_ID = '2851641ba9cd477cbfa7d84bd992f8c1';
+const REDIRECT_URI = 'https://egan-spotify.netlify.app/callback';
 
 const SCOPES = [
   'streaming',
