@@ -55,7 +55,7 @@ export async function initiateLogin() {
 export async function handleCallback(code) {
   const verifier = sessionStorage.getItem('pkce_verifier');
 
-  const res = await fetch('https://accounts.spotify.com/api/token', {
+  const res = await fetch('/spotify/auth/api/token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({
@@ -78,7 +78,7 @@ export async function refreshAccessToken() {
   const refreshToken = localStorage.getItem('spotify_refresh_token');
   if (!refreshToken) throw new Error('No refresh token available');
 
-  const res = await fetch('https://accounts.spotify.com/api/token', {
+  const res = await fetch('/spotify/auth/api/token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({

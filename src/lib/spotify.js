@@ -1,6 +1,6 @@
 import { getAccessToken, isTokenExpired, refreshAccessToken } from './auth';
 
-const BASE = 'https://api.spotify.com/v1';
+const BASE = '/spotify/api';
 
 let tokenPromise = null;
 
