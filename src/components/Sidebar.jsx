@@ -1,15 +1,22 @@
 import { useState } from 'react';
-import { Home, Search, Library, Plus, ChevronRight, Music2, LogOut } from 'lucide-react';
+import { Home, Search, Library, Plus, ChevronRight, Music2, LogOut, Copy, Check } from 'lucide-react';
 import { useSpotify } from '../context/SpotifyContext';
-import { logout } from '../lib/auth';
+import { logout, exportTokens } from '../lib/auth';
 
 export default function Sidebar() {
   const { playlists, view, setView, user } = useSpotify();
   const [filter, setFilter] = useState('');
+  const [copied, setCopied] = useState(false);
 
   const handleLogout = () => {
     logout();
     window.location.reload();
+  };
+
+  const handleExport = () => {
+    navigator.clipboard.writeText(exportTokens());
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const filteredPlaylists = playlists.filter(p =>
@@ -147,6 +154,13 @@ export default function Sidebar() {
             </div>
           )}
           <span className="text-xs font-semibold text-white flex-1 truncate">{user.display_name}</span>
+          <button
+            onClick={handleExport}
+            title="Export tokens to use on another device"
+            className="text-[#B3B3B3] hover:text-white transition-colors p-1"
+          >
+            {copied ? <Check size={14} className="text-[#1DB954]" /> : <Copy size={14} />}
+          </button>
           <button
             onClick={handleLogout}
             title="Log out"
