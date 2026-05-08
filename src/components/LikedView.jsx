@@ -7,6 +7,7 @@ import TrackItem from './TrackItem';
 export default function LikedView() {
   const { playTrack, togglePlay, playerState } = useSpotify();
   const [tracks, setTracks] = useState([]);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [nextOffset, setNextOffset] = useState(null);
@@ -16,6 +17,7 @@ export default function LikedView() {
       try {
         const data = await spotify.getSavedTracks(50, 0);
         setTracks(data.items || []);
+        setTotal(data.total || 0);
         setNextOffset(data.next ? 50 : null);
       } finally {
         setLoading(false);
@@ -63,7 +65,7 @@ export default function LikedView() {
         <div>
           <span className="text-xs font-bold uppercase text-white">Playlist</span>
           <h1 className="text-4xl font-bold text-white mt-1 mb-2">Liked Songs</h1>
-          <p className="text-sm text-[#B3B3B3]">{tracks.length} songs</p>
+          <p className="text-sm text-[#B3B3B3]">{total} songs</p>
         </div>
       </div>
 
