@@ -16,6 +16,9 @@ const SCOPES = [
   'playlist-read-collaborative',
 ].join(' ');
 
+// Bump this any time SCOPES changes so stale tokens are cleared automatically.
+const SCOPE_VERSION = '2';
+
 function generateRandomString(length) {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   const array = new Uint8Array(length);
@@ -104,6 +107,15 @@ function storeTokens(data) {
     localStorage.setItem('spotify_refresh_token', data.refresh_token);
   }
   localStorage.setItem('spotify_token_expiry', String(Date.now() + data.expires_in * 1000));
+  localStorage.setItem('spotify_scope_version', SCOPE_VERSION);
+}
+
+// Call on app start. If the stored token was obtained with an older scope
+// list it won't have playlist permissions — clear it so the user re-auths.
+export function clearIfScopesMismatch() {
+  if (isLoggedIn() && localStorage.getItem('spotify_scope_version') !== SCOPE_VERSION) {
+    logout();
+  }
 }
 
 export function getAccessToken() {

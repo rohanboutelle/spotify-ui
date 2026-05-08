@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { isLoggedIn } from './lib/auth';
-import { handleCallback } from './lib/auth';
+import { isLoggedIn, handleCallback, clearIfScopesMismatch } from './lib/auth';
 import { SpotifyProvider } from './context/SpotifyContext';
 import Login from './components/Login';
 import Layout from './components/Layout';
+
+clearIfScopesMismatch();
 
 export default function App() {
   const [authed, setAuthed] = useState(isLoggedIn());
