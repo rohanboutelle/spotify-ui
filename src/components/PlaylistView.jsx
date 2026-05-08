@@ -2,7 +2,6 @@ import { useEffect, useState, useCallback } from 'react';
 import { Play, Pause, Shuffle, Clock } from 'lucide-react';
 import { spotify } from '../lib/spotify';
 import { useSpotify } from '../context/SpotifyContext';
-import { logout } from '../lib/auth';
 import TrackItem from './TrackItem';
 
 export default function PlaylistView({ id }) {
@@ -78,29 +77,20 @@ export default function PlaylistView({ id }) {
     const isForbidden = error.status === 403;
     return (
       <div className="h-full flex flex-col items-center justify-center gap-4 text-center px-6">
-        <p className="text-white text-lg font-semibold">Failed to load playlist.</p>
-        <p className="text-[#B3B3B3] text-sm">{error.message || String(error)}</p>
-        {isForbidden && (
-          <p className="text-[#B3B3B3] text-sm max-w-sm">
-            Your session is missing required permissions. Log out and back in to fix this.
-          </p>
-        )}
-        <div className="flex gap-3">
-          <button
-            onClick={load}
-            className="px-5 py-2 bg-[#1DB954] hover:bg-[#1ed760] text-black text-sm font-bold rounded-full transition-colors"
-          >
-            Try again
-          </button>
-          {isForbidden && (
-            <button
-              onClick={() => { logout(); window.location.reload(); }}
-              className="px-5 py-2 bg-[#282828] hover:bg-[#3E3E3E] text-white text-sm font-bold rounded-full transition-colors"
-            >
-              Log out
-            </button>
-          )}
-        </div>
+        <p className="text-white text-lg font-semibold">
+          {isForbidden ? "This playlist isn't available." : 'Failed to load playlist.'}
+        </p>
+        <p className="text-[#B3B3B3] text-sm max-w-sm">
+          {isForbidden
+            ? "This playlist may be private or restricted. Only playlists you own or public playlists can be opened."
+            : (error.message || String(error))}
+        </p>
+        <button
+          onClick={load}
+          className="px-5 py-2 bg-[#1DB954] hover:bg-[#1ed760] text-black text-sm font-bold rounded-full transition-colors"
+        >
+          Try again
+        </button>
       </div>
     );
   }
