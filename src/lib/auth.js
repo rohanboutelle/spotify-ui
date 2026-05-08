@@ -52,13 +52,13 @@ export async function initiateLogin() {
     code_challenge: challenge,
   });
 
-  window.location.href = `https://accounts.spotify.com/authorize?${params}`;
+  window.location.href = `/spotify/auth/authorize?${params}`;
 }
 
 export async function handleCallback(code) {
   const verifier = sessionStorage.getItem('pkce_verifier');
 
-  const res = await fetch('https://accounts.spotify.com/api/token', {
+  const res = await fetch('/spotify/auth/api/token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({
@@ -81,7 +81,7 @@ export async function refreshAccessToken() {
   const refreshToken = localStorage.getItem('spotify_refresh_token');
   if (!refreshToken) throw new Error('No refresh token available');
 
-  const res = await fetch('https://accounts.spotify.com/api/token', {
+  const res = await fetch('/spotify/auth/api/token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({
@@ -140,4 +140,22 @@ export function logout() {
   ['spotify_access_token', 'spotify_refresh_token', 'spotify_token_expiry'].forEach(k =>
     localStorage.removeItem(k)
   );
+}
+
+export function exportTokens() {
+  return JSON.stringify({
+    access_token: localStorage.getItem('spotify_access_token'),
+    refresh_token: localStorage.getItem('spotify_refresh_token'),
+    expiry: localStorage.getItem('spotify_token_expiry'),
+  });
+}
+
+export function importTokens(json) {
+  const data = JSON.parse(json);
+  if (!data.access_token || !data.refresh_token || !data.expiry) {
+    throw new Error('Invalid token data');
+  }
+  localStorage.setItem('spotify_access_token', data.access_token);
+  localStorage.setItem('spotify_refresh_token', data.refresh_token);
+  localStorage.setItem('spotify_token_expiry', data.expiry);
 }

@@ -2,6 +2,20 @@
   command = "npm run build"
   publish = "dist"
 
+# Proxy Spotify API — traffic exits from Netlify's servers, not the client's IP
+[[redirects]]
+  from = "/spotify/api/*"
+  to = "https://api.spotify.com/v1/:splat"
+  status = 200
+  force = true
+
+# Proxy Spotify auth (token exchange / refresh)
+[[redirects]]
+  from = "/spotify/auth/*"
+  to = "https://accounts.spotify.com/:splat"
+  status = 200
+  force = true
+
 [[redirects]]
   from = "/*"
   to = "/index.html"

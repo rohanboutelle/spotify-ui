@@ -22,7 +22,8 @@ export default function PlaylistView({ id }) {
     setError(null);
     setTracks([]);
     setPlaylist(null);
-    try {
+
+    const attempt = async () => {
       const [pl, tr] = await Promise.all([
         spotify.getPlaylist(id),
         spotify.getPlaylistTracks(id, 50, 0),
@@ -30,16 +31,23 @@ export default function PlaylistView({ id }) {
       setPlaylist(pl);
       setTracks(tr.items?.filter(i => i.track) || []);
       setNextOffset(tr.next ? 50 : null);
-    } catch (err) {
-      setError(err);
+    };
+
+    try {
+      await attempt();
+    } catch (firstErr) {
+      try {
+        await new Promise(r => setTimeout(r, 1000));
+        await attempt();
+      } catch (err) {
+        setError(err || firstErr);
+      }
     } finally {
       setLoading(false);
     }
   }, [id]);
 
-  useEffect(() => {
-    load();
-  }, [load]);
+  useEffect(() => { load(); }, [load]);
 
   const loadMore = useCallback(async () => {
     if (!nextOffset || loadingMore) return;
@@ -71,7 +79,7 @@ export default function PlaylistView({ id }) {
     return (
       <div className="h-full flex flex-col items-center justify-center gap-4 text-center px-6">
         <p className="text-white text-lg font-semibold">Failed to load playlist.</p>
-        <p className="text-[#B3B3B3] text-sm">{error.message}</p>
+        <p className="text-[#B3B3B3] text-sm">{error.message || String(error)}</p>
         {isForbidden && (
           <p className="text-[#B3B3B3] text-sm max-w-sm">
             Your session is missing required permissions. Log out and back in to fix this.
