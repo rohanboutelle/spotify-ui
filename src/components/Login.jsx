@@ -1,9 +1,24 @@
-import { initiateLogin } from '../lib/auth';
+import { useState } from 'react';
+import { initiateLogin, importTokens } from '../lib/auth';
 
-export default function Login({ error }) {
+export default function Login({ error: authError, onAuthed }) {
+  const [showImport, setShowImport] = useState(false);
+  const [tokenInput, setTokenInput] = useState('');
+  const [importError, setImportError] = useState('');
+
+  const handleImport = () => {
+    setImportError('');
+    try {
+      importTokens(tokenInput.trim());
+      window.location.reload();
+    } catch {
+      setImportError('Invalid token data. Make sure you copied it correctly.');
+    }
+  };
+
   return (
     <div className="flex items-center justify-center h-screen bg-[#121212]">
-      <div className="text-center max-w-sm px-6">
+      <div className="text-center max-w-sm px-6 w-full">
         {/* Spotify logo */}
         <div className="flex justify-center mb-8">
           <svg viewBox="0 0 24 24" className="w-16 h-16 fill-[#1DB954]" xmlns="http://www.w3.org/2000/svg">
@@ -16,9 +31,9 @@ export default function Login({ error }) {
           Stream your music. Control playback, browse playlists, and discover new tracks — all in one place.
         </p>
 
-        {error && (
+        {authError && (
           <div className="bg-red-900/40 border border-red-500/40 text-red-300 rounded-lg px-4 py-3 mb-6 text-sm">
-            {error}
+            {authError}
           </div>
         )}
 
@@ -28,6 +43,41 @@ export default function Login({ error }) {
         >
           Log in with Spotify
         </button>
+
+        {/* Token import */}
+        <div className="mt-6">
+          <button
+            onClick={() => setShowImport(v => !v)}
+            className="text-[#B3B3B3] hover:text-white text-sm underline underline-offset-2 transition-colors"
+          >
+            {showImport ? 'Hide' : 'Blocked by a filter? Import tokens'}
+          </button>
+
+          {showImport && (
+            <div className="mt-4 text-left">
+              <p className="text-[#B3B3B3] text-xs mb-3 leading-relaxed">
+                Log in on a device without restrictions, click the export button in the sidebar, then paste the copied text below.
+              </p>
+              <textarea
+                value={tokenInput}
+                onChange={e => setTokenInput(e.target.value)}
+                placeholder='Paste token JSON here…'
+                rows={4}
+                className="w-full bg-[#282828] text-white text-xs px-3 py-2 rounded-lg placeholder-[#6A6A6A] outline-none focus:ring-1 focus:ring-white/20 resize-none font-mono"
+              />
+              {importError && (
+                <p className="text-red-400 text-xs mt-2">{importError}</p>
+              )}
+              <button
+                onClick={handleImport}
+                disabled={!tokenInput.trim()}
+                className="mt-3 w-full bg-[#282828] hover:bg-[#3E3E3E] disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold py-2.5 px-4 rounded-full text-sm transition-colors"
+              >
+                Import and log in
+              </button>
+            </div>
+          )}
+        </div>
 
         <p className="text-[#6A6A6A] text-xs mt-6 leading-relaxed">
           Requires a Spotify account. A Premium subscription is needed for in-browser playback. Free accounts can use remote device control.

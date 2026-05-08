@@ -129,3 +129,21 @@ export function logout() {
     localStorage.removeItem(k)
   );
 }
+
+export function exportTokens() {
+  return JSON.stringify({
+    access_token: localStorage.getItem('spotify_access_token'),
+    refresh_token: localStorage.getItem('spotify_refresh_token'),
+    expiry: localStorage.getItem('spotify_token_expiry'),
+  });
+}
+
+export function importTokens(json) {
+  const data = JSON.parse(json);
+  if (!data.access_token || !data.refresh_token || !data.expiry) {
+    throw new Error('Invalid token data');
+  }
+  localStorage.setItem('spotify_access_token', data.access_token);
+  localStorage.setItem('spotify_refresh_token', data.refresh_token);
+  localStorage.setItem('spotify_token_expiry', data.expiry);
+}
