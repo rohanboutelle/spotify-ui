@@ -49,7 +49,7 @@ export async function initiateLogin() {
     code_challenge: challenge,
   });
 
-  window.location.href = `https://accounts.spotify.com/authorize?${params}`;
+  window.location.href = `/spotify/auth/authorize?${params}`;
 }
 
 export async function handleCallback(code) {
