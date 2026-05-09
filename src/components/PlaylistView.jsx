@@ -23,9 +23,8 @@ export default function PlaylistView({ id }) {
     setPlaylist(null);
 
     const attempt = async () => {
-      // getPlaylist already embeds the first 100 tracks in pl.tracks.items —
-      // no need for a separate /tracks call which Spotify restricts for some apps.
       const pl = await spotify.getPlaylist(id);
+      console.log('[Playlist Debug] tracks.total:', pl.tracks?.total, '| items.length:', pl.tracks?.items?.length, '| tracks obj:', pl.tracks);
       setPlaylist(pl);
       const items = pl.tracks?.items?.filter(i => i.track) || [];
       setTracks(items);
