@@ -1,4 +1,4 @@
-const CLIENT_ID = '2851641ba9cd477cbfa7d84bd992f8c1';
+const CLIENT_ID = '6a0ab1291c1b4c2f889256167c3605e2';
 const REDIRECT_URI = 'https://egan-spotify.netlify.app/callback';
 
 const SCOPES = [
@@ -17,7 +17,7 @@ const SCOPES = [
 ].join(' ');
 
 // Bump this any time SCOPES changes so stale tokens are cleared automatically.
-const SCOPE_VERSION = '2';
+const SCOPE_VERSION = '3';
 
 function generateRandomString(length) {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
